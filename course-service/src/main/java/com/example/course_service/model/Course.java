@@ -1,6 +1,6 @@
 package com.example.course_service.model;
 
-import java.util.LinkedList;
+import java.math.BigDecimal;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -12,7 +12,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.Builder.Default;
 
 
 @Entity
@@ -35,8 +34,11 @@ public class Course {
     @Column(name="instructerId")
     private Long instructerId;
 
-    private LinkedList<?> students;
-    
+    @Column(name="tuitionFee")
+    private BigDecimal tuitionFee;
+
+    @Column(name="isApproved")
+    private Boolean isApproved;
 
     
 }

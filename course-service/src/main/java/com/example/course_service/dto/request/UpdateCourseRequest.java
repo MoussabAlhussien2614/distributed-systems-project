@@ -13,7 +13,8 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-public class CreateCourseRequest {
+public class UpdateCourseRequest {
     private String name;
     private BigDecimal tuitionFee;
+    private Boolean isApproved;
 }

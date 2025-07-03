@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.course_service.dto.request.CreateCourseRequest;
+import com.example.course_service.dto.request.UpdateCourseRequest;
 import com.example.course_service.dto.response.CourseResponse;
 import com.example.course_service.service.CourseService;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -54,7 +55,7 @@ public class CourseController {
     
     
     @PutMapping("/{id}")
-    public ResponseEntity<CourseResponse> update(@PathVariable Long id, @RequestBody CreateCourseRequest request) {
+    public ResponseEntity<CourseResponse> update(@PathVariable Long id, @RequestBody UpdateCourseRequest request) {
         var response = this.courseService.update(id, request);
 
         return ResponseEntity.ok(response);
