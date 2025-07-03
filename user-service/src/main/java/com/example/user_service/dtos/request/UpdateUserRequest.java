@@ -1,7 +1,6 @@
 package com.example.user_service.dtos.request;
 
 
-import com.example.user_service.models.Role;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
