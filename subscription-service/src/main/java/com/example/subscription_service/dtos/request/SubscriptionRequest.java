@@ -1,0 +1,17 @@
+package com.example.subscription_service.dtos.request;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@SuperBuilder
+public class SubscriptionRequest {
+    private Long studentId;
+    private Long courseId;
+    private String status;
+    
+}
