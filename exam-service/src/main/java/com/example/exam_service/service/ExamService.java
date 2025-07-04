@@ -5,15 +5,22 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import com.example.exam_service.dtos.request.AnswerRequest;
+import com.example.exam_service.dtos.request.AttemptRequest;
 import com.example.exam_service.dtos.request.ExamRequest;
 import com.example.exam_service.dtos.request.OptionRequest;
 import com.example.exam_service.dtos.request.QuestionRequest;
+import com.example.exam_service.dtos.response.AnswerResponse;
+import com.example.exam_service.dtos.response.AttemptResponse;
 import com.example.exam_service.dtos.response.ExamResponse;
 import com.example.exam_service.dtos.response.OptionResponse;
 import com.example.exam_service.dtos.response.QuestionResponse;
+import com.example.exam_service.models.Answer;
+import com.example.exam_service.models.Attempt;
 import com.example.exam_service.models.Exam;
 import com.example.exam_service.models.Option;
 import com.example.exam_service.models.Question;
+import com.example.exam_service.repositories.AnswerRepository;
 import com.example.exam_service.repositories.AttemptRepository;
 import com.example.exam_service.repositories.ExamRepository;
 import com.example.exam_service.repositories.OptionRepository;
@@ -21,6 +28,8 @@ import com.example.exam_service.repositories.QuestionRepository;
 
 @Service
 public class ExamService {
+
+    private final AnswerRepository answerRepository;
     private AttemptRepository attemptRepository;
 	private ExamRepository examRepository;
 	private QuestionRepository questionRepository;
@@ -30,7 +39,9 @@ public class ExamService {
         AttemptRepository attemptRepository,
         ExamRepository examRepository,
         QuestionRepository questionRepository, 
-        OptionRepository optionRepository){
+        OptionRepository optionRepository,
+        AnswerRepository answerRepository){
+            this.answerRepository = answerRepository; 
             this.attemptRepository = attemptRepository;
             this.examRepository = examRepository;
             this.questionRepository = questionRepository;
@@ -113,5 +124,68 @@ public class ExamService {
                     .build())
                 .collect(Collectors.toList()))
             .build();
+    }
+
+    public AttemptResponse createAttempt(Long examId, AttemptRequest request){
+        Exam exam = examRepository.findById(examId)
+            .orElseThrow(() -> new RuntimeException("Exam with id {examId} not found."));
+        List<Long> optoin_ids = request.getAnswers().stream()
+            .map((AnswerRequest ans) -> ans.getOptionId())
+            .collect(Collectors.toList());
+        List<Option> options = optionRepository.findAllById(optoin_ids);
+
+        Integer finalScore = 0;
+        for (Option op : options) {
+            if (op.getIsCorrect()){
+                finalScore += op.getQuestion().getPoints();
+            }
+        }
+        Attempt attempt = attemptRepository.save( Attempt.builder()
+            .exam(exam)
+            .studentId(request.getStudentId())
+            .finalScore(finalScore)
+            .build());
+        List<Answer> answers = request.getAnswers().stream()
+            .map((AnswerRequest ans) -> Answer.builder()
+                .attempt(attempt)
+                .option(optionRepository.findById(ans.getOptionId()).orElse(null))
+                .build())
+            .collect(Collectors.toList());
+        answerRepository.saveAll(answers);
+        return AttemptResponse.builder()
+            .id(attempt.getId())
+            .studentId(attempt.getStudentId())
+            .examId(attempt.getExam().getId())
+            .answers(answers.stream()
+                .map((Answer ans) -> AnswerResponse.builder()
+                    .id(ans.getId())
+                    .optionId(ans.getOption().getId())
+                    .optionContent(ans.getOption().getContent())
+                    .build())
+                .collect(Collectors.toList())
+            )
+            .build();
+    }
+    public List<AttemptResponse> listAttempts(Long examId){
+        Exam exam = examRepository.findById(examId)
+            .orElseThrow(() -> new RuntimeException("Exam with id {examId} not found."));
+ 
+        List<Attempt> attempts = attemptRepository.findByExam(exam);
+
+        return attempts.stream()
+            .map((Attempt attempt) -> AttemptResponse.builder()
+                .id(attempt.getId())
+                .studentId(attempt.getStudentId())
+                .examId(attempt.getExam().getId())
+                .answers(attempt.getAnswers().stream()
+                    .map((Answer ans) -> AnswerResponse.builder()
+                        .id(ans.getId())
+                        .optionId(ans.getOption().getId())
+                        .optionContent(ans.getOption().getContent())
+                        .build())
+                    .collect(Collectors.toList())
+                )
+                .build())
+            .collect(Collectors.toList());
     }
 }

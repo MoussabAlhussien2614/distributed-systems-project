@@ -19,7 +19,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Answers {
+public class Answer {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,6 +30,9 @@ public class Answers {
     @JoinColumn(name="optionId")
     private Option option;
 
-    @Column(name="studentId")
-    private Long studentId;
+    
+    @ManyToOne()
+    @JoinColumn(name="attemptId")
+    private Attempt attempt;
+
 }
