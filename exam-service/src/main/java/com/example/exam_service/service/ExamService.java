@@ -39,8 +39,25 @@ public class ExamService {
 
     public List<ExamResponse> list(){
         List<ExamResponse> exams = examRepository.findAll().stream()
-            .map((Exam e) -> ExamResponse.builder()
-                
+            .map((Exam e) ->ExamResponse.builder()
+                .id(e.getId())
+                .courseId(e.getCourseId())
+                .questions(e.getQuestions().stream()
+                    .map((Question quest) -> QuestionResponse.builder()
+                        .id(quest.getId())
+                        .examId(quest.getExam().getId())
+                        .content(quest.getContent())
+                        .points(quest.getPoints())
+                        .options(quest.getOptions().stream()
+                            .map((Option opt) -> OptionResponse.builder()
+                                .id(opt.getId())
+                                .questionId(opt.getQuestion().getId())
+                                .isCorrect(opt.getIsCorrect())  
+                                .content(opt.getContent())
+                                .build())
+                            .collect(Collectors.toList()))
+                        .build())
+                    .collect(Collectors.toList()))
                 .build())
             .collect(Collectors.toList());
         return exams;
