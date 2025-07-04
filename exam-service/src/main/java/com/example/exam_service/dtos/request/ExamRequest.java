@@ -14,5 +14,6 @@ import lombok.experimental.SuperBuilder;
 
 public class ExamRequest {
     private Long courseId;
+    private Integer passingLimit;
     private List<QuestionRequest> questions;
 }

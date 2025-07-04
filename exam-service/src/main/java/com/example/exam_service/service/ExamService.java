@@ -41,6 +41,7 @@ public class ExamService {
         List<ExamResponse> exams = examRepository.findAll().stream()
             .map((Exam e) ->ExamResponse.builder()
                 .id(e.getId())
+                .passingLimit(e.getPassingLimit())
                 .courseId(e.getCourseId())
                 .questions(e.getQuestions().stream()
                     .map((Question quest) -> QuestionResponse.builder()
@@ -65,6 +66,7 @@ public class ExamService {
 
     public ExamResponse create(ExamRequest request){
         Exam exam = examRepository.save(Exam.builder()
+            .passingLimit(request.getPassingLimit())
             .courseId(request.getCourseId())
             .build());
 
@@ -92,6 +94,7 @@ public class ExamService {
 
         return ExamResponse.builder()
             .id(exam.getId())
+            .passingLimit(exam.getPassingLimit())
             .courseId(exam.getCourseId())
             .questions(exam.getQuestions().stream()
                 .map((Question quest) -> QuestionResponse.builder()
