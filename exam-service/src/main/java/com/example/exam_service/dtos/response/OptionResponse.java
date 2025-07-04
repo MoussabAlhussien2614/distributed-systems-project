@@ -12,6 +12,6 @@ import lombok.experimental.SuperBuilder;
 public class OptionResponse {
     private Long id;
     private Long questionId;
-    private String option;
+    private String content;
     private Boolean isCorrect;
 }

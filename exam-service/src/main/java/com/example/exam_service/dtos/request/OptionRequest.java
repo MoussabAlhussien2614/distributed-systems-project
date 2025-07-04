@@ -11,6 +11,6 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 public class OptionRequest {
     private Long questionId;
-    private String option;
+    private String content;
     private Boolean isCorrect;
 }

@@ -19,7 +19,7 @@ public class ExamController {
     public ExamController(ExamService examService){
         this.examService = examService;
     }
-    @PostMapping("")
+    @PostMapping()
     public ExamResponse create(@RequestBody ExamRequest request) {
         var response  = examService.create(request);
         return response;
