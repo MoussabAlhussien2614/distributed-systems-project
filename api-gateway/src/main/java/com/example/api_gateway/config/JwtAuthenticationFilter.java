@@ -24,6 +24,20 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
             "/eureka"
     );
 
+    private static final List<List<String>> ADMIN_PATHS = List.of(
+        List.of("PUT",".*/api/courses/\\d+/approval$")
+    );
+
+    
+    private static final List<List<String>> INSTRUCTOR_PATHS = List.of(
+        List.of("PUT",".*/api/courses/\\d+$")
+                
+    );
+
+    
+    private static final List<List<String>> USER_PATHS = List.of(
+
+    );
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         ServerHttpRequest request = exchange.getRequest();
@@ -48,11 +62,36 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
             return exchange.getResponse().setComplete();
         }
 
-        // Extract user info from token
+
         String userId = jwtService.extractUserId(jwt);
         String username = jwtService.extractUsername(jwt);
         String roles = jwtService.extractRoles(jwt);
+        System.out.println(roles.contains("ADMIN"));
+        if (ADMIN_PATHS.stream()
+            .anyMatch((list) -> list.get(0).equals(request.getMethod().toString()) && path.matches(list.get(1)))
+            &&  !roles.contains("ADMIN")){
 
+            exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
+            return exchange.getResponse().setComplete();
+        }
+
+        if (INSTRUCTOR_PATHS.stream()
+            .anyMatch((list) -> list.get(0).equals(request.getMethod().toString()) && path.matches(list.get(1)))
+            &&  !roles.contains("INSTRUCTOR")){
+
+            exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
+            return exchange.getResponse().setComplete();
+        }
+
+        if (USER_PATHS.stream()
+            .anyMatch((list) -> list.get(0).equals(request.getMethod().toString()) && path.matches(list.get(1)))
+            &&  !roles.contains("USER")){
+
+            exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
+            return exchange.getResponse().setComplete();
+        }
+        // Extract user info from token
+        
         // Mutate request with user info headers
         ServerHttpRequest modifiedRequest = request.mutate()
                 .header("X-User-Id", userId)

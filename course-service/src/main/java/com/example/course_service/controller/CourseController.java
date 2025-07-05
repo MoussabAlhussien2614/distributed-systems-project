@@ -15,7 +15,6 @@ import com.example.course_service.dto.request.CreateCourseRequest;
 import com.example.course_service.dto.request.UpdateCourseRequest;
 import com.example.course_service.dto.response.CourseInstructerResponse;
 import com.example.course_service.dto.response.CourseResponse;
-import com.example.course_service.model.CourseInstructer;
 import com.example.course_service.service.CourseService;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.PathVariable;
