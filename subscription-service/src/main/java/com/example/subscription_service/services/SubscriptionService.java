@@ -32,7 +32,6 @@ public class SubscriptionService {
         Subscription sub =  Subscription.builder()
                 .studentId(request.getStudentId())
                 .courseId(request.getCourseId())
-                .status(request.getStatus())
                 .build();
 
                 
@@ -41,7 +40,6 @@ public class SubscriptionService {
                 .id(sub.getId())
                 .studentId(request.getStudentId())
                 .courseId(request.getCourseId())
-                .status(request.getStatus())
                 .build();
     }
 
@@ -51,7 +49,6 @@ public class SubscriptionService {
                 .id(subscription.getId())
                 .studentId(subscription.getStudentId())
                 .courseId(subscription.getCourseId())
-                .status(subscription.getStatus())
                 .build();
     }
 }

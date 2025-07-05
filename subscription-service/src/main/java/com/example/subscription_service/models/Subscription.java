@@ -31,8 +31,6 @@ public class Subscription {
     @Column(name="courseId")
     private Long courseId;
 
-    @Column(name="status")
-    private String status;
 
 
 }

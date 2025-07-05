@@ -9,6 +9,6 @@ public class SubscriptionResponse {
     private Long id;
     private Long studentId;
     private Long courseId;
-    private String status;
+
     
 }

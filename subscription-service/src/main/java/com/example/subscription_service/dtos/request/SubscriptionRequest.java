@@ -12,6 +12,5 @@ import lombok.experimental.SuperBuilder;
 public class SubscriptionRequest {
     private Long studentId;
     private Long courseId;
-    private String status;
-    
+
 }
