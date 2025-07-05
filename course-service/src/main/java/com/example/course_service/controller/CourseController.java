@@ -42,6 +42,11 @@ public class CourseController {
         var response = this.courseService.list();
         return response;
     }
+    @GetMapping("/enrolled-in")
+    public List<CourseResponse> listEnrolledInCourses(@RequestHeader("X-User-Id") Long id) {
+        var response = this.courseService.listEnrolledInCourses(id);
+        return response;
+    }
     
     @GetMapping("/{id}")
     public CourseResponse retrieve(@PathVariable Long id) {

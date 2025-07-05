@@ -1,5 +1,6 @@
 package com.example.course_service.service;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -34,6 +35,31 @@ public class CourseService {
    public List<CourseResponse> list(){
       List<Course> courses = courseRepository.findAll();
       
+      List<CourseResponse> result = courses.stream()
+         .map((Course course) -> CourseResponse.builder()
+            .id(course.getId())
+            .name(course.getName())
+            .instructerId(course.getInstructerId())
+            .tutionFee(course.getTuitionFee())
+            .isApproved(course.getIsApproved())
+            .build())
+         .collect(Collectors.toList());
+      return result;
+   }   
+
+    public List<CourseResponse> listEnrolledInCourses(Long id){
+      String url = discoveryClient.getInstances("subscription-service")
+         .get(0)
+         .getUri()
+         .toString() + "/api/subscriptions/enrolled-in";
+      
+      RestTemplate restTemplate = new RestTemplateBuilder()
+         .defaultHeader("X-User-Id", Long.toString(id))
+         .build();
+      
+      // Option 1: Direct object mapping
+      Long[] ids = restTemplate.getForObject(url, Long[].class);
+      List<Course> courses = courseRepository.findAllById(Arrays.asList(ids));
       List<CourseResponse> result = courses.stream()
          .map((Course course) -> CourseResponse.builder()
             .id(course.getId())

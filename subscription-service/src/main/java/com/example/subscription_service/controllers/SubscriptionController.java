@@ -11,6 +11,7 @@ import com.example.subscription_service.services.SubscriptionService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 
 @RestController
@@ -34,6 +35,14 @@ public class SubscriptionController {
         var response = subscriptionService.list();
         return response;
     }
+
+    @GetMapping("enrolled-in")
+    public List<Long> listEnrolledInCourses(@RequestHeader("X-User-Id") Long id){
+        System.out.println(id);
+        var response = subscriptionService.listEnrolledInCourses(id);
+        return response;
+    }
+
 
     
     @PostMapping()

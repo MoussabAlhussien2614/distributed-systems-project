@@ -1,6 +1,7 @@
 package com.example.subscription_service.services;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.stereotype.Service;
@@ -36,6 +37,18 @@ public class SubscriptionService {
                 .map(this::convertToResponse)
                 .toList(); // Java 16+ alternative to Collectors.toList()
     }
+
+      public List<Long> listEnrolledInCourses(Long id) {
+        List<Subscription> subs =  subscriptionRepository.findByStudentId(id);
+
+        return subs.stream()
+            .map((sub) -> sub.getCourseId())
+            .collect(Collectors.toList())
+                .stream()
+                .distinct()
+                .toList();
+    }
+
 
 
       public SubscriptionResponse create(SubscriptionRequest request){
