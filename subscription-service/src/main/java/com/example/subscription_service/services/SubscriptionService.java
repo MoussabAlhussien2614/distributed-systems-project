@@ -34,6 +34,8 @@ public class SubscriptionService {
                 .courseId(request.getCourseId())
                 .status(request.getStatus())
                 .build();
+
+                
         subscriptionRepository.save(sub);
         return SubscriptionResponse.builder()
                 .id(sub.getId())

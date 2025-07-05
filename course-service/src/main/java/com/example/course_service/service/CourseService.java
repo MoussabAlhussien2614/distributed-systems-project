@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -17,13 +18,17 @@ import com.example.course_service.model.Course;
 import com.example.course_service.model.CourseInstructer;
 import com.example.course_service.repository.CourseRepository;
 
+import jakarta.persistence.EntityNotFoundException;
+
 @Service
 public class CourseService {
    private CourseRepository courseRepository;
    private  RestTemplate restTemplate;
+   private DiscoveryClient discoveryClient;
 
-   public CourseService(CourseRepository courseRepository){
+   public CourseService(CourseRepository courseRepository, DiscoveryClient discoveryClient ){
       this.courseRepository = courseRepository;
+      this.discoveryClient = discoveryClient;
       this.restTemplate = new RestTemplate();
    }
    public List<CourseResponse> list(){
@@ -57,7 +62,12 @@ public class CourseService {
    public CourseInstructerResponse retrieveInstructer(Long id, String auth){
       Course course = courseRepository.findById(id)
          .orElseThrow(() -> new RuntimeException("course not found"));
-      String url = "http://localhost:8081/api/users/{id}";
+
+      // String url = "http://localhost:8081/api/users/{id}";
+      String url = discoveryClient.getInstances("user-service")
+         .get(0)
+         .getUri()
+         .toString() + "/api/users/{id}";
       
       RestTemplate restTemplate = new RestTemplateBuilder()
          .defaultHeader("Authorization",auth)
@@ -134,7 +144,7 @@ public class CourseService {
 
     public Void delete(Long id){
       Course course = courseRepository.findById(id)
-         .orElseThrow(() -> new RuntimeException("Id not found."));
+         .orElseThrow(() -> new EntityNotFoundException("Id not found."));
 
       courseRepository.delete(course);
       return null;

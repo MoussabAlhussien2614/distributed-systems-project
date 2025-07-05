@@ -2,6 +2,7 @@ package com.example.course_service.controller;
 
 import java.util.List;
 
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -50,7 +51,6 @@ public class CourseController {
 
     @GetMapping("/{id}/with-instructer")
     public CourseInstructerResponse retrieveIntructer(@PathVariable Long id, @RequestHeader("Authorization") String auth) {
-        System.out.println(auth);
         var response = courseService.retrieveInstructer(id, auth);
         return response;
     }
