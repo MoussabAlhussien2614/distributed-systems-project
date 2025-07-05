@@ -14,6 +14,8 @@ import lombok.experimental.SuperBuilder;
 public class AttemptResponse {
     private Long id;
     private Long examId;
+    private String result;
+    private Integer finalScore;
     private Long studentId;
     private List<AnswerResponse> answers;
     

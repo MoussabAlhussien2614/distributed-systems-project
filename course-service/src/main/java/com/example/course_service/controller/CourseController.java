@@ -70,6 +70,13 @@ public class CourseController {
         return ResponseEntity.ok(response);
     }
     
+    @PutMapping("/{id}/approval")
+    public ResponseEntity<CourseResponse> updateApproval(@PathVariable Long id, @RequestBody UpdateCourseRequest request) {
+        var response = this.courseService.updateApproval(id, request);
+
+        return ResponseEntity.ok(response);
+    }
+    
     
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {

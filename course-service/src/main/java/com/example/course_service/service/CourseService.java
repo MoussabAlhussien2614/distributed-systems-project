@@ -95,6 +95,22 @@ public class CourseService {
       course.setName(Objects.requireNonNullElse(request.getName(), course.getName()));
       course.setTuitionFee(Optional.ofNullable(request.getTuitionFee())
          .orElse(course.getTuitionFee()));
+
+      courseRepository.save(course);
+
+      return CourseResponse.builder()
+         .id(course.getId())
+         .name(course.getName())
+         .instructerId(course.getInstructerId())
+         .tutionFee(course.getTuitionFee())
+         .isApproved(course.getIsApproved())
+         .build();
+   } 
+
+      public CourseResponse updateApproval(Long id ,UpdateCourseRequest request) {
+      Course course = courseRepository.findById(id)
+         .orElseThrow(() -> new RuntimeException("Id not found."));
+
       course.setIsApproved(Optional.ofNullable(request.getIsApproved())
          .orElse(course.getIsApproved()));
       courseRepository.save(course);

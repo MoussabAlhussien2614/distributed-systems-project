@@ -155,6 +155,7 @@ public class ExamService {
         return AttemptResponse.builder()
             .id(attempt.getId())
             .studentId(attempt.getStudentId())
+            .finalScore(finalScore)
             .examId(attempt.getExam().getId())
             .answers(answers.stream()
                 .map((Answer ans) -> AnswerResponse.builder()
