@@ -7,11 +7,11 @@ import java.util.stream.Collectors;
 
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.client.RestTemplate;
 
 import com.example.course_service.dto.request.CreateCourseRequest;
 import com.example.course_service.dto.request.UpdateCourseRequest;
+import com.example.course_service.dto.response.CourseInstructerResponse;
 import com.example.course_service.dto.response.CourseResponse;
 import com.example.course_service.model.Course;
 import com.example.course_service.model.CourseInstructer;
@@ -54,7 +54,7 @@ public class CourseService {
             .build();
    }
    
-   public CourseInstructer retrieveInstructer(Long id, String auth){
+   public CourseInstructerResponse retrieveInstructer(Long id, String auth){
       Course course = courseRepository.findById(id)
          .orElseThrow(() -> new RuntimeException("course not found"));
       String url = "http://localhost:8081/api/users/{id}";
@@ -66,7 +66,15 @@ public class CourseService {
       // Option 1: Direct object mapping
       CourseInstructer instructer = restTemplate.getForObject(url, CourseInstructer.class, course.getInstructerId());
         
-      return  instructer;
+      return  CourseInstructerResponse.builder()
+            .id(course.getId())
+            .name(course.getName())
+            .instructerId(course.getInstructerId())
+            .tutionFee(course.getTuitionFee())
+            .isApproved(course.getIsApproved())
+            .courseInstructer(instructer)
+            .build();   
+            
    }   
 
 

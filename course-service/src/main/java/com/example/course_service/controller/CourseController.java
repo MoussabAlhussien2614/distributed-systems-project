@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.course_service.dto.request.CreateCourseRequest;
 import com.example.course_service.dto.request.UpdateCourseRequest;
+import com.example.course_service.dto.response.CourseInstructerResponse;
 import com.example.course_service.dto.response.CourseResponse;
 import com.example.course_service.model.CourseInstructer;
 import com.example.course_service.service.CourseService;
@@ -48,8 +49,8 @@ public class CourseController {
         return response;
     }
 
-    @GetMapping("/{id}/instructer")
-    public CourseInstructer retrieveIntructer(@PathVariable Long id, @RequestHeader("Authorization") String auth) {
+    @GetMapping("/{id}/with-instructer")
+    public CourseInstructerResponse retrieveIntructer(@PathVariable Long id, @RequestHeader("Authorization") String auth) {
         System.out.println(auth);
         var response = courseService.retrieveInstructer(id, auth);
         return response;

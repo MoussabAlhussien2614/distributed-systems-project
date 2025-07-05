@@ -144,6 +144,7 @@ public class ExamService {
             .exam(exam)
             .studentId(request.getStudentId())
             .finalScore(finalScore)
+            .result(finalScore > exam.getPassingLimit() ? "Passed" : "Failed")
             .build());
         List<Answer> answers = request.getAnswers().stream()
             .map((AnswerRequest ans) -> Answer.builder()
@@ -157,6 +158,7 @@ public class ExamService {
             .studentId(attempt.getStudentId())
             .finalScore(finalScore)
             .examId(attempt.getExam().getId())
+            .result(attempt.getResult())
             .answers(answers.stream()
                 .map((Answer ans) -> AnswerResponse.builder()
                     .id(ans.getId())

@@ -42,5 +42,9 @@ public class Attempt {
     @OneToMany()
     @JoinColumn(name="attemptId")
     private List<Answer> answers;
+
+    @OneToMany()
+    @JoinColumn(name="result")
+    private String result;
     
 }
