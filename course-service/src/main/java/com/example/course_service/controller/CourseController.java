@@ -2,7 +2,6 @@ package com.example.course_service.controller;
 
 import java.util.List;
 
-import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;

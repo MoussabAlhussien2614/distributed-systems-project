@@ -18,6 +18,8 @@ import com.example.course_service.dto.response.CourseResponse;
 import com.example.course_service.model.Course;
 import com.example.course_service.model.CourseInstructer;
 import com.example.course_service.repository.CourseRepository;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixProperty;
 
 import jakarta.persistence.EntityNotFoundException;
 
@@ -85,6 +87,8 @@ public class CourseService {
             .build();
    }
    
+   @HystrixCommand(threadPoolKey= "depDetails",fallbackMethod = "retrieveInstructerFallback",
+            commandProperties = { @HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "60000")})
    public CourseInstructerResponse retrieveInstructer(Long id, String auth){
       Course course = courseRepository.findById(id)
          .orElseThrow(() -> new RuntimeException("course not found"));
@@ -113,6 +117,12 @@ public class CourseService {
 
    }   
 
+    public CourseInstructerResponse retrieveInstructerFallback(Long id, String auth){
+ 
+      return  CourseInstructerResponse.builder()
+            .build();   
+
+   }   
 
 
    public CourseResponse create(CreateCourseRequest request){
