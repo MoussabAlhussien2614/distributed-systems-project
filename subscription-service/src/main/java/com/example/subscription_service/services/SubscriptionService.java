@@ -20,17 +20,11 @@ public class SubscriptionService {
         this.subscriptionRepository = subscriptionRepository; 
     }
 
-    public List<SubscriptionResponse> list(){
-        List<SubscriptionResponse> subs = subscriptionRepository.findAll().stream()
-            .map((Subscription sub) -> SubscriptionResponse.builder()
-                .id(sub.getId())
-                .studentId(sub.getStudentId())
-                .courseId(sub.getCourseId())
-                .status(sub.getStatus())
-                .build())
-            .collect(Collectors.toList());
-        
-        return subs;
+    public List<SubscriptionResponse> list() {
+        return subscriptionRepository.findAll()
+                .stream()
+                .map(this::convertToResponse)
+                .toList(); // Java 16+ alternative to Collectors.toList()
     }
 
 
@@ -46,6 +40,16 @@ public class SubscriptionService {
                 .studentId(request.getStudentId())
                 .courseId(request.getCourseId())
                 .status(request.getStatus())
+                .build();
+    }
+
+
+    private SubscriptionResponse convertToResponse(Subscription subscription) {
+        return SubscriptionResponse.builder()
+                .id(subscription.getId())
+                .studentId(subscription.getStudentId())
+                .courseId(subscription.getCourseId())
+                .status(subscription.getStatus())
                 .build();
     }
 }
