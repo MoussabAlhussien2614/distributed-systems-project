@@ -43,8 +43,7 @@ public class Attempt {
     @JoinColumn(name="attemptId")
     private List<Answer> answers;
 
-    @OneToMany()
-    @JoinColumn(name="result")
+    @Column(name="result")
     private String result;
     
 }
