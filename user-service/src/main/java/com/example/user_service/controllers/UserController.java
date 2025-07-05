@@ -7,6 +7,7 @@ import com.example.user_service.models.User;
 import com.example.user_service.services.AuthenticationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -59,6 +60,13 @@ public class UserController {
             @Valid @RequestBody ChangePasswordRequest request) {
         userService.changePassword(id, request);
         return ResponseEntity.ok().build();
+    }
+
+
+    @GetMapping("/test")
+    public String test(@Value("${server.port}") String port) {
+        System.out.println("Handling request on port: " + port);
+        return "Handled by port: " + port;
     }
 
 }
