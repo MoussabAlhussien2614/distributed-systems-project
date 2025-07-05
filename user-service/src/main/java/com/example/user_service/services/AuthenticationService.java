@@ -1,6 +1,7 @@
 package com.example.user_service.services;
 
 import com.example.user_service.config.JWTService;
+import com.example.user_service.dtos.BalanceUser;
 import com.example.user_service.dtos.request.AuthenticationRequest;
 import com.example.user_service.dtos.request.ChangePasswordRequest;
 import com.example.user_service.dtos.request.RegisterRequest;
@@ -12,12 +13,20 @@ import com.example.user_service.models.Role;
 import com.example.user_service.models.User;
 import com.example.user_service.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.cloud.client.discovery.DiscoveryClient;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 @Service
@@ -30,8 +39,8 @@ public class AuthenticationService {
     private final JWTService jwtService;
     private final AuthenticationManager authenticationManager;
 
-
-
+    private final DiscoveryClient  discoveryClient;
+    
     public AuthenticationResponse registerInstructor(RegisterRequest request, User currentUser) {
         if (repository.existsByUsername(request.getUsername())) {
             throw new RuntimeException("Username already in use");
@@ -66,15 +75,32 @@ public class AuthenticationService {
 
 
         var user = User.builder()
-                .firstName(request.getFirstname())
-                .lastName(request.getLastname())
-                .username(request.getUsername())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .role(Role.USER)
-                .build();
+        .firstName(request.getFirstname())
+        .lastName(request.getLastname())
+        .username(request.getUsername())
+        .password(passwordEncoder.encode(request.getPassword()))
+        .role(Role.USER)
+        .build();
 
         repository.save(user);
+        System.out.println("hi ther");
+        String url = discoveryClient.getInstances("subscription-service")
+            .get(0)
+            .getUri()
+            .toString() + "/api/balances";
+        
+        System.out.println(url);
+        // String url = "http//localhost:8083/api/balances";
+        RestTemplate restTemplate = new RestTemplateBuilder()
+         .build();
 
+        Map<String, Object> requestBody = new HashMap<>();
+        requestBody.put("userId", user.getId());
+        requestBody.put("balance", (long) 1000000000);
+        
+        ResponseEntity<BalanceUser> userBalance = restTemplate
+            .postForEntity(url, new HttpEntity<>(requestBody), BalanceUser.class);
+        
         var jwtToken = jwtService.generateToken(user);
         return AuthenticationResponse.builder()
                 .token(jwtToken)
