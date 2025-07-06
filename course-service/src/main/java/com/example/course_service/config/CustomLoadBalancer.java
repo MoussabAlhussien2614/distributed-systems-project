@@ -15,38 +15,43 @@ import java.util.Map;
 
 public class CustomLoadBalancer implements ReactorServiceInstanceLoadBalancer {
 
+
     private int lastInstance;
+
     private final ServiceInstanceListSupplier serviceInstanceListSupplier;
 
-    public CustomLoadBalancer(ServiceInstanceListSupplier supplier) {
-        this.serviceInstanceListSupplier = supplier;
+    public CustomLoadBalancer(ServiceInstanceListSupplier serviceInstanceListSupplier) {
+        this.serviceInstanceListSupplier = serviceInstanceListSupplier;
         this.lastInstance = 0;
     }
+
 
     @Override
     public Mono<Response<ServiceInstance>> choose(Request request) {
         return serviceInstanceListSupplier.get().next().map(this::selectInstance);
     }
 
+
     private Response<ServiceInstance> selectInstance(List<ServiceInstance> instances) {
         if (instances.isEmpty()) return new EmptyResponse();
 
+        // Build weighted list
         List<ServiceInstance> weightedList = new ArrayList<>();
-
         for (ServiceInstance instance : instances) {
             int weight = parseWeight(instance);
             for (int i = 0; i < weight; i++) {
                 weightedList.add(instance);
             }
         }
-
-        lastInstance = (lastInstance + 1) % weightedList.size();
+        lastInstance = lastInstance == weightedList.size() - 1 ? 0 : lastInstance + 1;
+        System.out.println(weightedList.get(lastInstance).getPort());
         return new DefaultResponse(weightedList.get(lastInstance));
     }
 
+
     private int parseWeight(ServiceInstance instance) {
         Map<String, String> metadata = instance.getMetadata();
-        String weightStr = metadata.getOrDefault("weight", "1");
+        String weightStr = metadata.getOrDefault("weight", "1"); // Default weight=1
         try {
             return Math.max(1, Integer.parseInt(weightStr));
         } catch (NumberFormatException e) {

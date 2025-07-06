@@ -8,6 +8,11 @@ import java.util.stream.Collectors;
 
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -28,10 +33,10 @@ public class CourseService {
    private  RestTemplate restTemplate;
    private DiscoveryClient discoveryClient;
 
-   public CourseService(CourseRepository courseRepository, DiscoveryClient discoveryClient ){
+   public CourseService(CourseRepository courseRepository, DiscoveryClient discoveryClient, RestTemplate restTemplate ){
       this.courseRepository = courseRepository;
       this.discoveryClient = discoveryClient;
-      this.restTemplate = new RestTemplate();
+      this.restTemplate = restTemplate;
    }
    public List<CourseResponse> list(){
       List<Course> courses = courseRepository.findAll();
@@ -92,7 +97,7 @@ public class CourseService {
 
    }
    
-   @CircuitBreaker(name="circuitA", fallbackMethod="retrieveInstructerFallback")
+   // @CircuitBreaker(name="circuitA", fallbackMethod="retrieveInstructerFallback")
    public CourseInstructerResponse retrieveInstructer(Long id, String auth){
       Course course = courseRepository.findById(id)
          .orElseThrow(() -> new RuntimeException("course not found"));
@@ -104,12 +109,21 @@ public class CourseService {
          .getUri()
          .toString() + "/api/users/{id}";
       
-      RestTemplate restTemplate = new RestTemplateBuilder()
-         .defaultHeader("Authorization",auth)
-         .build();
-      
+      // RestTemplate restTemplate = new RestTemplateBuilder()
+      //    .defaultHeader("Authorization",auth)
+      //    .build();
+      HttpHeaders headers = new HttpHeaders();
+         headers.set("Authorization", auth);
+         headers.setContentType(MediaType.APPLICATION_JSON);
+
+      HttpEntity<String> requestEntity = new HttpEntity<>( headers);
+
       // Option 1: Direct object mapping
-      CourseInstructer instructer = restTemplate.getForObject(url, CourseInstructer.class, course.getInstructerId());
+      ResponseEntity<CourseInstructer> instructer = restTemplate.exchange(
+         "http://user-service/api/users/{id}",
+         HttpMethod.GET,
+         requestEntity,
+          CourseInstructer.class, course.getInstructerId());
         
       return  CourseInstructerResponse.builder()
             .id(course.getId())
@@ -117,7 +131,7 @@ public class CourseService {
             .instructerId(course.getInstructerId())
             .tutionFee(course.getTuitionFee())
             .isApproved(course.getIsApproved())
-            .courseInstructer(instructer)
+            .courseInstructer(instructer.getBody())
             .build();   
 
    }   
