@@ -12,6 +12,7 @@ import com.example.exam_service.service.ExamService;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 import java.util.List;
 
@@ -42,7 +43,8 @@ public class ExamController {
     }
 
     @PostMapping("/{id}/attempts")
-    public AttemptResponse createAttempt(@PathVariable Long id, @RequestBody AttemptRequest request) {
+    public AttemptResponse createAttempt(@PathVariable Long id, @RequestBody AttemptRequest request, @RequestHeader("X-User-Id") Long studentId) {
+        request.setStudentId(studentId);
         var response  = examService.createAttempt(id, request);
         return response;
     }

@@ -171,7 +171,7 @@ public class ExamService {
     }
     public List<AttemptResponse> listAttempts(Long examId){
         Exam exam = examRepository.findById(examId)
-            .orElseThrow(() -> new RuntimeException("Exam with id {examId} not found."));
+            .orElseThrow(() -> new RuntimeException("Exam with id Entered not found."));
  
         List<Attempt> attempts = attemptRepository.findByExam(exam);
 
@@ -180,6 +180,8 @@ public class ExamService {
                 .id(attempt.getId())
                 .studentId(attempt.getStudentId())
                 .examId(attempt.getExam().getId())
+                .result(attempt.getResult())
+                .finalScore(attempt.getFinalScore())
                 .answers(attempt.getAnswers().stream()
                     .map((Answer ans) -> AnswerResponse.builder()
                         .id(ans.getId())
