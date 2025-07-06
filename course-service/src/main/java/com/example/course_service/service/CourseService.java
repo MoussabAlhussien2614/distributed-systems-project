@@ -18,9 +18,8 @@ import com.example.course_service.dto.response.CourseResponse;
 import com.example.course_service.model.Course;
 import com.example.course_service.model.CourseInstructer;
 import com.example.course_service.repository.CourseRepository;
-import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
-import com.netflix.hystrix.contrib.javanica.annotation.HystrixProperty;
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import jakarta.persistence.EntityNotFoundException;
 
 @Service
@@ -86,13 +85,19 @@ public class CourseService {
             .isApproved(course.getIsApproved())
             .build();
    }
+     public CourseInstructerResponse retrieveInstructerFallback(Long id, String auth, Exception e){
+ 
+      return  CourseInstructerResponse.builder()
+            .build();   
+
+   }
    
-   @HystrixCommand(threadPoolKey= "depDetails",fallbackMethod = "retrieveInstructerFallback",
-            commandProperties = { @HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "60000")})
+   @CircuitBreaker(name="circuitA", fallbackMethod="retrieveInstructerFallback")
    public CourseInstructerResponse retrieveInstructer(Long id, String auth){
       Course course = courseRepository.findById(id)
          .orElseThrow(() -> new RuntimeException("course not found"));
 
+    
       // String url = "http://localhost:8081/api/users/{id}";
       String url = discoveryClient.getInstances("user-service")
          .get(0)
@@ -113,13 +118,6 @@ public class CourseService {
             .tutionFee(course.getTuitionFee())
             .isApproved(course.getIsApproved())
             .courseInstructer(instructer)
-            .build();   
-
-   }   
-
-    public CourseInstructerResponse retrieveInstructerFallback(Long id, String auth){
- 
-      return  CourseInstructerResponse.builder()
             .build();   
 
    }   
